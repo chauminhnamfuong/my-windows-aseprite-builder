@@ -26,7 +26,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: 3. Cài đặt CMake và Ninja
-        uses: lukka/get-cmake@v3
+        uses: lukka/get-cmake@v3.29.3
 
       - name: 4. Tải thư viện Skia Prebuilt
         run: |
