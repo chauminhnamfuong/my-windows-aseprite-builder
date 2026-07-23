@@ -25,8 +25,8 @@ jobs:
       - name: 2. Thiết lập môi trường Developer Command Prompt cho VS 2022
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: 3. Cài đặt Ninja
-        uses: ninja-build/setup-ninja@v5
+      - name: 3. Cài đặt CMake và Ninja
+        uses: lukka/get-cmake@v3
 
       - name: 4. Tải thư viện Skia Prebuilt
         run: |
