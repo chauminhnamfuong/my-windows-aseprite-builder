@@ -30,8 +30,8 @@ jobs:
 
       - name: 4. Tải thư viện Skia Prebuilt
         run: |
-          curl -L -s -o Skia-Windows-Release-x64.zip https://github.com/aseprite/skia/releases/download/m102-861e474326/Skia-Windows-Release-x64.zip
-          7z x Skia-Windows-Release-x64.zip -o"C:\skia"
+          curl -L -s -o Skia-Windows-Release-x64.zip https://github.com/aseprite/skia/releases/download/m102-861e474326/Skia-Windows-Release-X64.zip
+          7z x Skia-Windows-Release-X64.zip -o"C:\skia"
 
       - name: 5. Cấu hình CMake
         run: |
