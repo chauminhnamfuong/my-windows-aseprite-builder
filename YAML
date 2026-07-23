@@ -1,0 +1,66 @@
+name: Build Aseprite Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      aseprite_tag:
+        description: 'Thẻ (Tag) hoặc Nhánh (Branch) của Aseprite cần build'
+        required: true
+        default: 'v1.3.17.2'
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: 1. Checkout repository Aseprite
+        uses: actions/checkout@v4
+        with:
+          repository: 'aseprite/aseprite'
+          ref: ${{ inputs.aseprite_tag }}
+          submodules: 'recursive'
+          path: 'aseprite'
+
+      - name: 2. Thiết lập môi trường Developer Command Prompt cho VS 2022
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 3. Cài đặt Ninja
+        uses: ninja-build/setup-ninja@v5
+
+      - name: 4. Tải thư viện Skia Prebuilt
+        run: |
+          curl -L -s -o Skia-Windows-Release-x64.zip https://github.com/aseprite/skia/releases/download/m102-861e474326/Skia-Windows-Release-x64.zip
+          7z x Skia-Windows-Release-x64.zip -o"C:\skia"
+
+      - name: 5. Cấu hình CMake
+        run: |
+          mkdir aseprite\build
+          cd aseprite\build
+          cmake -G "Ninja" .. `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DLAF_BACKEND=skia `
+            -DSKIA_DIR="C:\skia" `
+            -DSKIA_LIBRARY_DIR="C:\skia\out\Release-x64" `
+            -DSKIA_LIBRARY="C:\skia\out\Release-x64\skia.lib"
+
+      - name: 6. Biên dịch (Build) Aseprite
+        run: |
+          cd aseprite\build
+          ninja aseprite
+
+      - name: 7. Đóng gói thư mục Bin
+        id: package
+        run: |
+          cd aseprite\build\bin
+          7z a -tzip ..\..\..\Aseprite-Windows-${{ inputs.aseprite_tag }}.zip *
+          
+          # Xuất tên file ra biến $GITHUB_OUTPUT theo tiêu chuẩn mới
+          echo "zip_name=Aseprite-Windows-${{ inputs.aseprite_tag }}.zip" >> $env:GITHUB_OUTPUT
+
+      - name: 8. Tải file ZIP thành phẩm lên Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aseprite-Windows-${{ inputs.aseprite_tag }}
+          path: ${{ steps.package.outputs.zip_name }}
+          retention-days: 7
